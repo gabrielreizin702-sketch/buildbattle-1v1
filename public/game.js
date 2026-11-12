@@ -35,7 +35,7 @@ function enterGame(code,id){
   $("lobby").classList.add("hidden"); $("game").classList.remove("hidden");
   $("roomLabel").textContent="SALA "+code;
   $("status").textContent="Compartilhe o código: "+code;
-  init3D(); started=true;
+  started=true; init3D();
   toast("Sala criada! Envie o código "+code+" para seu amigo.");
 }
 function toast(t){
