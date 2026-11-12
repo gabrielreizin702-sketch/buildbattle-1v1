@@ -64,29 +64,22 @@ io.on("connection", socket => {
     io.to(socket.data.room).emit("built", piece);
   });
 
-  socket.on("shoot", ({ targetId, origin, direction } = {}, reply = () => {}) => {
-    const room = rooms.get(socket.data.room);
-    const shooter = room?.players.get(socket.id);
-    const target = room?.players.get(targetId);
-    if (!shooter || !target || target.hp <= 0 || !origin || !direction) return;
-    const now = Date.now();
-    if (now - shooter.lastShot < 250) return;
-    const ox = Number(origin.x), oy = Number(origin.y), oz = Number(origin.z);
-    const dx = Number(direction.x), dy = Number(direction.y), dz = Number(direction.z);
-    const len = Math.hypot(dx, dy, dz);
-    if (![ox, oy, oz, dx, dy, dz].every(Number.isFinite) || len < .9 || len > 1.1) return;
-    if (Math.hypot(ox - shooter.x, oy - shooter.y, oz - shooter.z) > 3.5) return;
-    const tx = target.x - ox, ty = (target.y - .15) - oy, tz = target.z - oz;
-    const distance = Math.hypot(tx, ty, tz);
-    if (distance > 55 || distance < .1) return;
-    const projection = (tx * dx + ty * dy + tz * dz) / distance;
-    const perpendicular = Math.sqrt(Math.max(0, 1 - projection * projection)) * distance;
-    if (projection < .995 || perpendicular > 1.15) return;
-    shooter.lastShot = now;
-    target.hp = Math.max(0, target.hp - 25);
-    io.to(socket.data.room).emit("health", { id: target.id, hp: target.hp });
-    if (target.hp === 0) io.to(socket.data.room).emit("roundOver", { winner: shooter.name, loser: target.name });
-    reply({ ok: true });
+  socket.on("shoot", ({ targetId, origin, direction, weapon = 0 } = {}, reply = () => {}) => {
+    const room=rooms.get(socket.data.room),shooter=room?.players.get(socket.id),target=room?.players.get(targetId);
+    if(!shooter||!target||target.hp<=0||!origin||!direction)return;
+    const now=Date.now(),shotgun=Number(weapon)===1;if(now-shooter.lastShot<(shotgun?600:120))return;
+    const ox=Number(origin.x),oy=Number(origin.y),oz=Number(origin.z),dx=Number(direction.x),dy=Number(direction.y),dz=Number(direction.z),len=Math.hypot(dx,dy,dz);
+    if(![ox,oy,oz,dx,dy,dz].every(Number.isFinite)||len<.9||len>1.1)return;
+    if(Math.hypot(ox-shooter.x,oy-shooter.y,oz-shooter.z)>9)return;
+    const tx=target.x-ox,ty=(target.y+.05)-oy,tz=target.z-oz,distance=Math.hypot(tx,ty,tz),maxRange=shotgun?32:75;
+    if(distance>maxRange||distance<.1)return;
+    const projection=(tx*dx+ty*dy+tz*dz)/distance,perpendicular=Math.sqrt(Math.max(0,1-projection*projection))*distance;
+    if(projection<.985||perpendicular>(shotgun?1.25:.72))return;
+    shooter.lastShot=now;target.hp=Math.max(0,target.hp-(shotgun?9:18));
+    io.to(socket.data.room).emit("shotFx",{from:{x:ox,y:oy,z:oz},to:{x:target.x,y:target.y+1,z:target.z},color:shotgun?"#ffa45c":"#ffe08a"});
+    io.to(socket.data.room).emit("health",{id:target.id,hp:target.hp});
+    if(target.hp===0)io.to(socket.data.room).emit("roundOver",{winner:shooter.name,loser:target.name});
+    reply({ok:true});
   });
 
   socket.on("restartRound", () => {
