@@ -76,7 +76,7 @@ io.on("connection", socket => {
     const projection=(tx*dx+ty*dy+tz*dz)/distance,perpendicular=Math.sqrt(Math.max(0,1-projection*projection))*distance;
     if(projection<.985||perpendicular>(shotgun?1.25:.72))return;
     shooter.lastShot=now;target.hp=Math.max(0,target.hp-(shotgun?9:18));
-    io.to(socket.data.room).emit("shotFx",{from:{x:ox,y:oy,z:oz},to:{x:target.x,y:target.y+1,z:target.z},color:shotgun?"#ffa45c":"#ffe08a"});
+    io.to(socket.data.room).emit("shotFx",{from:{x:ox,y:oy,z:oz},to:{x:target.x,y:target.y+.05,z:target.z},color:shotgun?"#ffa45c":"#ffe08a"});
     io.to(socket.data.room).emit("health",{id:target.id,hp:target.hp});
     if(target.hp===0)io.to(socket.data.room).emit("roundOver",{winner:shooter.name,loser:target.name});
     reply({ok:true});
