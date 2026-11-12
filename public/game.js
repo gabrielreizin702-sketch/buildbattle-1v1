@@ -169,7 +169,7 @@ function addBuild(p){
 }
 function shoot(){
  const weapon=weapons[weaponIndex],now=performance.now();if(now-lastShotAt<weapon.delay)return;lastShotAt=now;
- const origin=camera.position.clone(),dir=new THREE.Vector3(-Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),-Math.cos(yaw)*Math.cos(pitch)).normalize();
+ const origin=camera.position.clone(),dir=new THREE.Vector3();camera.getWorldDirection(dir);dir.normalize();
  const spread=weaponIndex===1?.055:.006,pellets=weaponIndex===1?8:1;
  for(let i=0;i<pellets;i++){
   const shotDir=dir.clone().add(new THREE.Vector3((Math.random()-.5)*spread,(Math.random()-.5)*spread,(Math.random()-.5)*spread)).normalize();
