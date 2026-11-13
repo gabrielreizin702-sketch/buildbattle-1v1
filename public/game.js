@@ -274,9 +274,9 @@ function updatePlayer(dt) {
     y: nextY,
     z: previous.z
   };
-  candidate = resolveBuildCollisions(candidate, colliders);
+  candidate = resolveBuildCollisions(candidate, colliders, { height: PLAYER_HEIGHT, previous });
   candidate.z += move.z;
-  candidate = resolveBuildCollisions(candidate, colliders);
+  candidate = resolveBuildCollisions(candidate, colliders, { height: PLAYER_HEIGHT, previous });
   candidate.x = THREE.MathUtils.clamp(candidate.x, -48, 48);
   candidate.z = THREE.MathUtils.clamp(candidate.z, -48, 48);
 
