@@ -106,3 +106,18 @@ test("lateral da rampa bloqueia entrada por baixo", () => {
   const result = resolveBuildCollisions({ x: 1.9, y: 0, z: 0 }, [ramp]);
   assert.ok(result.x >= 2.38);
 });
+
+test("pulo contra a parte inferior do piso é resolvido verticalmente", () => {
+  const floor = { type: "floor", x: 0, y: 1, z: 0, rot: 0 };
+  const previous = { x: 0, y: -1.4, z: 0 };
+  const result = resolveBuildCollisions(
+    { x: 0, y: -1.1, z: 0 },
+    [floor],
+    { previous }
+  );
+  assert.equal(result.x, 0);
+  assert.equal(result.z, 0);
+  const ceiling = resolveFloorCeiling(previous.y, -1.1, result.x, result.z, [floor]);
+  assert.equal(ceiling.hit, true);
+  assert.ok(Math.abs(ceiling.y - -1.36) < 1e-9);
+});
