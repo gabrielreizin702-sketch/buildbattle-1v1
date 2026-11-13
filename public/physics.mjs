@@ -58,7 +58,8 @@ export function resolveBuildCollisions(position, builds, options = {}) {
         // A player standing on the top surface is not embedded in the box.
         if (result.y + height <= bottom + EPS || result.y >= top - EPS) continue;
         // A player falling from above should land on the platform, not be pushed off its edge.
-        if (piece.type === "floor" && result.y >= bottom - 0.02) continue;
+        const crossedFloorTop = options.previous && options.previous.y >= top - 0.18 && result.y <= top + 0.03;
+        if (piece.type === "floor" && (result.y >= bottom - 0.02 || crossedFloorTop)) continue;
 
         const local = localXZ(piece, result.x, result.z);
         const closestX = clamp(local.x, -halfX, halfX);
@@ -101,7 +102,7 @@ export function resolveBuildCollisions(position, builds, options = {}) {
           verticalOverlap &&
           Math.abs(local.z) <= 2 + radius &&
           Math.abs(local.x) > 2 - radius &&
-          result.y < surface - 0.03
+          result.y < surface - 0.25
         ) {
           local.x = (Math.sign(local.x) || 1) * (2 + radius + 0.001);
           const world = worldXZ(piece, local.x, local.z);
@@ -116,7 +117,7 @@ export function resolveBuildCollisions(position, builds, options = {}) {
           local.z < -2 + radius &&
           Math.abs(local.x) <= 2 + radius &&
           result.y < piece.y + 2.8 &&
-          result.y < surface - 0.03
+          result.y < surface - 0.25
         ) {
           local.z = -2 - radius - 0.001;
           const world = worldXZ(piece, local.x, local.z);
@@ -169,7 +170,7 @@ export function findSupportHeight(previous, current, builds, velocityY, wasGroun
         wasGrounded &&
         previousSurface !== null &&
         Math.abs(previous.y - previousSurface) < 0.3 &&
-        surface - previous.y <= 0.25 &&
+        surface - previous.y <= 0.35 &&
         surface - previous.y >= -0.8;
       if (fallingOnto || walkingAlong) consider(surface);
     }
