@@ -1,7 +1,7 @@
 const EPS = 1e-6;
 
 export const PLAYER_RADIUS = 0.38;
-export const PLAYER_HEIGHT = 1.95;
+export const PLAYER_HEIGHT = 2.25;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
