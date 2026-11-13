@@ -59,7 +59,8 @@ export function resolveBuildCollisions(position, builds, options = {}) {
         if (result.y + height <= bottom + EPS || result.y >= top - EPS) continue;
         // A player falling from above should land on the platform, not be pushed off its edge.
         const crossedFloorTop = options.previous && options.previous.y >= top - 0.18 && result.y <= top + 0.03;
-        if (piece.type === "floor" && (result.y >= bottom - 0.02 || crossedFloorTop)) continue;
+        const hitFloorCeiling = options.previous && options.previous.y + height <= bottom + 0.02 && result.y + height > bottom;
+        if (piece.type === "floor" && (result.y >= bottom - 0.02 || crossedFloorTop || hitFloorCeiling)) continue;
 
         const local = localXZ(piece, result.x, result.z);
         const closestX = clamp(local.x, -halfX, halfX);
