@@ -49,26 +49,24 @@ export function resolveBuildCollisions(position, builds, options = {}) {
     let changed = false;
 
     for (const piece of builds) {
-      if (piece.type === "wall" || piece.type === "floor") {
-        const halfX = 2;
-        const halfZ = piece.type === "wall" ? 0.14 : 2;
-        const bottom = piece.type === "wall" ? piece.y - 1.6 : piece.y - 0.11;
-        const top = piece.type === "wall" ? piece.y + 1.6 : piece.y + 0.11;
+      // Floors are one-way platforms: the top supports landings and the
+      // ceiling test blocks upward movement from below, while side contact
+      // does not prevent a player from jumping onto the platform.
+      if (piece.type === "floor") continue;
 
-        // A player standing on the top surface is not embedded in the box.
+      if (piece.type === "wall") {
+        const halfX = 2;
+        const halfZ = 0.14;
+        const bottom = piece.y - 1.6;
+        const top = piece.y + 1.6;
         if (result.y + height <= bottom + EPS || result.y >= top - EPS) continue;
-        // A player falling from above should land on the platform, not be pushed off its edge.
-        const crossedFloorTop = options.previous && options.previous.y >= top - 0.18 && result.y <= top + 0.03;
-        const hitFloorCeiling = options.previous && options.previous.y + height <= bottom + 0.02 && result.y + height > bottom;
-        if (piece.type === "floor" && (result.y >= bottom - 0.02 || crossedFloorTop || hitFloorCeiling)) continue;
 
         const local = localXZ(piece, result.x, result.z);
         const closestX = clamp(local.x, -halfX, halfX);
         const closestZ = clamp(local.z, -halfZ, halfZ);
-        let dx = local.x - closestX;
-        let dz = local.z - closestZ;
-        let distance = Math.hypot(dx, dz);
-
+        const dx = local.x - closestX;
+        const dz = local.z - closestZ;
+        const distance = Math.hypot(dx, dz);
         if (distance >= radius) continue;
 
         if (distance > EPS) {
