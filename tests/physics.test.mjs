@@ -76,3 +76,33 @@ test("parede não bloqueia jogador que já está acima dela", () => {
   assert.equal(result.x, 0);
   assert.equal(result.z, 0);
 });
+
+test("aterrissagem em piso não é desviada pela colisão lateral", () => {
+  const floor = { type: "floor", x: 0, y: 1, z: 0, rot: 0 };
+  const previous = { x: 0, y: 1.3, z: 0 };
+  const result = resolveBuildCollisions(
+    { x: 0, y: 0.8, z: 0 },
+    [floor],
+    { previous }
+  );
+  assert.equal(result.x, 0);
+  assert.equal(result.z, 0);
+});
+
+test("rampa permite subir em passos de corrida sem perder o apoio", () => {
+  const ramp = { type: "ramp", x: 0, y: 0, z: 0, rot: 0 };
+  const support = findSupportHeight(
+    { x: 0, y: 2.45, z: -1.5 },
+    { x: 0, y: 2.414, z: -1.86 },
+    [ramp],
+    -0.9,
+    true
+  );
+  assert.equal(support, 2.702);
+});
+
+test("lateral da rampa bloqueia entrada por baixo", () => {
+  const ramp = { type: "ramp", x: 0, y: 0, z: 0, rot: 0 };
+  const result = resolveBuildCollisions({ x: 1.9, y: 0, z: 0 }, [ramp]);
+  assert.ok(result.x >= 2.38);
+});
