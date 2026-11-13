@@ -65,7 +65,7 @@ test("rampa sustenta o jogador ao aterrissar na superfície inclinada", () => {
 
 test("piso impede que o jogador salte através de sua parte inferior", () => {
   const floor = { type: "floor", x: 0, y: 1, z: 0, rot: 0 };
-  const result = resolveFloorCeiling(-1.1, -0.8, 0, 0, [floor]);
+  const result = resolveFloorCeiling(-1.4, -1.1, 0, 0, [floor]);
   assert.equal(result.hit, true);
   assert.ok(Math.abs(result.y - ((1 - 0.11) - PLAYER_HEIGHT)) < 1e-9);
 });
